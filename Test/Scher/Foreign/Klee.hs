@@ -18,8 +18,8 @@ foreign import ccall "klee/klee.h klee_report_error" c_klee_report_error :: CStr
 foreign import ccall "klee/klee.h klee_assume" c_klee_assume :: CUInt -> IO ()
 foreign import capi "klee/klee.h klee_assert" c_klee_assert :: CUInt -> IO ()
 
-range :: Int -> Int -> String -> IO Int
-range !lo !hi name = withCString name $ \name ->
+symbolicRange :: Int -> Int -> String -> IO Int
+symbolicRange !lo !hi name = withCString name $ \name ->
   c_klee_range lo hi name
 
 int :: String -> IO Int
