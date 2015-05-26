@@ -1,6 +1,10 @@
-{-# LANGUAGE FFI #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 module Test.Scher
-  (Symbolic
+  (Symbolic (symbolic)
+  ,Klee.assert
+  ,Klee.assume
+  ,Klee.range
+  ,Klee.reportError
   ) where
 
 import qualified Test.Scher.Foreign.Klee as Klee
@@ -19,7 +23,7 @@ instance Symbolic Char where
 
 instance Symbolic Bool where
   symbolic name = do
-    r <- Klee.range 0 1 name
+    r <- Klee.range 0 2 name
     return $ r == 0
 
 -- This syntax dodges a bug in the desugaring
@@ -27,7 +31,7 @@ instance (Symbolic t) => Symbolic [t] where
   symbolic name =
     symbolic (name ++ "#end")
     >>= \end ->
-    if end
+    if not end
     then return []
     else symbolic (name ++ "#hd")
          >>= \hd ->
