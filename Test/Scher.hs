@@ -7,7 +7,7 @@ module Test.Scher
   ,Klee.reportError
   ) where
 
-import qualified Test.Scher.Foreign.Klee as Klee
+import qualified Test.Scher.Klee as Klee
 import Data.Char
 
 class Symbolic t where

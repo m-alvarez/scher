@@ -7,7 +7,7 @@ module Test.Scher.Lazy
   ,Klee.reportError
   ) where
 
-import qualified Test.Scher.Foreign.Klee.Lazy as Klee
+import qualified Test.Scher.Klee.Pure as Klee
 import Data.Char
 
 class Symbolic t where

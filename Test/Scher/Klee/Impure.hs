@@ -1,6 +1,6 @@
 {-# INCLUDE "klee/klee.h" #-}
 {-# LANGUAGE ForeignFunctionInterface, MagicHash, BangPatterns #-}
-module Test.Scher.Foreign.Klee
+module Test.Scher.Klee.Impure
   (range
   ,int
   ,reportError
