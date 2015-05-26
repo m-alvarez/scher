@@ -23,7 +23,7 @@ instance Symbolic Char where
 
 instance Symbolic Bool where
   symbolic name = do
-    r <- Klee.range 0 2 name
+    r <- Klee.range 0 1 name
     return $ r == 0
 
 -- This syntax dodges a bug in the desugaring
