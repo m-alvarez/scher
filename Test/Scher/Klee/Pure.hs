@@ -1,6 +1,6 @@
 {-# INCLUDE "klee/klee.h" #-}
 {-# LANGUAGE ForeignFunctionInterface, MagicHash, BangPatterns #-}
-module Test.Scher.Foreign.Klee
+module Test.Scher.Klee.Pure
   (range
   ,int
   ,reportError
@@ -11,21 +11,23 @@ module Test.Scher.Foreign.Klee
 import Foreign.C
 import Foreign.C.String
 import Foreign.C.Types
+import System.IO.Unsafe
 
-foreign import ccall "klee/klee.h klee_range" c_klee_range :: Int -> Int -> CString -> IO Int
-foreign import ccall "klee/klee.h klee_int" c_klee_int :: CString -> IO Int
+foreign import ccall "klee/klee.h klee_range" c_klee_range :: Int -> Int -> CString -> Int
+foreign import ccall "klee/klee.h klee_int" c_klee_int :: CString -> Int
 foreign import ccall "klee/klee.h klee_report_error" c_klee_report_error :: CString -> Int -> CString -> CString -> IO ()
 foreign import ccall "klee/klee.h klee_assume" c_klee_assume :: CUInt -> IO ()
 foreign import capi "klee/klee.h klee_assert" c_klee_assert :: CUInt -> IO ()
 
-symbolicRange :: Int -> Int -> String -> IO Int
-symbolicRange !lo !hi name = withCString name $ \name ->
-  c_klee_range lo hi name
+range :: Int -> Int -> String -> Int
+range !lo !hi name = 
+  let c_name = unsafePerformIO $ newCString name in
+  c_name `seq` c_klee_range lo hi c_name
 
-int :: String -> IO Int
-int name = do
-  c_name <- newCString name
-  c_klee_int c_name
+int :: String -> Int
+int !name = 
+  let c_name = unsafePerformIO $ newCString name in
+  c_name `seq` c_klee_int c_name
 
 reportError :: String -> Int -> String -> String -> IO ()
 reportError file line message suffix = do
