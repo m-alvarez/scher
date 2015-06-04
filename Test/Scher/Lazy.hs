@@ -14,13 +14,13 @@ class Symbolic t where
   symbolic :: String -> t
 
 instance Symbolic Int where
-  symbolic = Klee.int
+  symbolic n = Klee.int (n ++ "%IntVal")
 
 instance Symbolic Char where
-  symbolic name = chr $ Klee.int name `mod` 256
+  symbolic name = chr $ Klee.int (name ++ "%CharVal") `mod` 256
 
 instance Symbolic Bool where
-  symbolic name = Klee.range 0 1 name == 0
+  symbolic name = Klee.range 0 1 (name ++ "%BoolVal") == 0
 
 -- This syntax dodges a bug in the desugaring
 instance (Symbolic t) => Symbolic [t] where
