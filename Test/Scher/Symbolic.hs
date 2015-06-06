@@ -1,57 +1,100 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+
 module Test.Scher.Symbolic
-  (Symbolic
+  (Symbolic, Sym
   ) where
 
-import qualified Test.Scher.Foreign.Klee as Klee
 import Data.Char
+import Control.Applicative
 
-class Symbolic t where
-  symbolic :: String -> IO t
+newtype Sym s t = Sym { runSym :: IO t }
 
-instance Symbolic Int where
-  symbolic = Klee.int
+class Symbolic s t where
+  make :: String -> Sym s t
 
-instance Symbolic Char where
-  symbolic name = do
-    i <- Klee.int name
-    return (chr $ i `mod` 255)
+class Assert s where
+  assert :: Bool -> Sym s ()
 
-instance Symbolic Bool where
-  symbolic name = do
-    r <- Klee.symbolicRange 0 2 name
-    return $ r == 0
+class Fail s where
+  failWith :: String -> Sym s ()
+  failWith = failWhen True
+  failWhen :: Bool -> String -> Sym s ()
+  failWhen b message = if b then failWith message else Sym (return ())
+
+class Assume s where
+  assume :: Bool -> Sym s ()
+
+instance Functor (Sym s) where
+  f `fmap` a = Sym $ f `fmap` runSym a
+
+instance Applicative (Sym s) where
+  pure = Sym . pure
+  (Sym f) <*> (Sym a) = Sym $ f <*> a
+
+instance (Assert s) => Monad (Sym s) where
+  return  = Sym . return
+  a >>= f = Sym $ runSym a >>= (runSym . f)
+
+instance (Symbolic m Int) => Symbolic m Char where
+  make name = do
+    i <- make (name ++ "%CharVal")
+    return (chr $ i `mod` 256)
+
+instance (Symbolic m Int) => Symbolic m Bool where
+  make name = do
+    i <- make (name ++ "%BoolVal") :: Sym m Int
+    return $ i `mod` 2 == 0
 
 -- This syntax dodges a bug in the desugaring
-instance (Symbolic t) => Symbolic [t] where
-  symbolic name =
-    symbolic (name ++ "#end")
+instance (Symbolic m Bool, Symbolic m t) => Symbolic m [t] where
+  make name =
+    make (name ++ "%IsCons")
     >>= \end ->
     if end
     then return []
-    else symbolic (name ++ "#hd")
+    else make (name ++ "%car")
          >>= \hd ->
-         symbolic (name ++ "#tl")
+         make (name ++ "%cdr")
          >>= \tl ->
          return $ hd : tl
 
-instance (Symbolic t1, Symbolic t2) => Symbolic (t1, t2) where
-  symbolic name = do
-    l <- symbolic (name ++ "#left")
-    r <- symbolic (name ++ "#right")
-    return (l, r)
+instance (Symbolic m t1, Symbolic m t2) => Symbolic m (t1, t2) where
+  make name = do
+    x1 <- make (name ++ "%1")
+    x2 <- make (name ++ "%2")
+    return (x1, x2)
 
-instance (Symbolic t1, Symbolic t2) => Symbolic (Either t1 t2) where
-  symbolic name =
-    symbolic (name ++ "#isLeft") 
+instance (Symbolic m t1, Symbolic m t2, Symbolic m t3) => Symbolic m (t1, t2, t3) where
+  make name = do
+    x1 <- make (name ++ "%1")
+    x2 <- make (name ++ "%2")
+    x3 <- make (name ++ "%3")
+    return (x1, x2, x3)
+
+instance (Symbolic m t1, Symbolic m t2, Symbolic m t3, Symbolic m t4) => Symbolic m (t1, t2, t3, t4) where
+  make name = do
+    x1 <- make (name ++ "%1")
+    x2 <- make (name ++ "%2")
+    x3 <- make (name ++ "%3")
+    x4 <- make (name ++ "%4")
+    return (x1, x2, x3, x4)
+
+instance (Symbolic m Bool, Symbolic m t1, Symbolic m t2) => Symbolic m (Either t1 t2) where
+  make name =
+    make (name ++ "#isLeft") 
     >>= \choice ->
     if choice
-    then Left `fmap` symbolic name
-    else Right `fmap` symbolic name
+    then Left `fmap` make name
+    else Right `fmap` make name
 
-instance (Symbolic t) => Symbolic (Maybe t) where
-  symbolic name =
-    symbolic (name ++ "#isNothing")
-    >>= \isNothing ->
-    if isNothing
-    then return Nothing
-    else Just `fmap` symbolic name
+instance (Symbolic m Bool, Symbolic m t) => Symbolic m (Maybe t) where
+  make name =
+    make (name ++ "%IsJust")
+    >>= \isJust ->
+    if isJust
+    then Just `fmap` make name
+    else return Nothing
