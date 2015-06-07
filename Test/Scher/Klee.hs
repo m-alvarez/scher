@@ -1,8 +1,10 @@
 module Test.Scher.Klee
+  ( module Common )
   where
 
 import qualified Test.Scher.Klee.Pure as Lazy
 import qualified Test.Scher.Klee.Impure as Strict
+import qualified Test.Scher.Klee.Common as Common
 import Test.Scher.Symbolic
 import Data.Char
 
