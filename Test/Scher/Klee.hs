@@ -1,9 +1,12 @@
 module Test.Scher.Klee
-  (module Test.Scher.Klee.Lazy, module Test.Scher.Klee.Eager, Klee(..))
   where
 
-import Test.Scher.Klee.Lazy
-import Test.Scher.Klee.Eager
+import qualified Test.Scher.Klee.Pure as Lazy
+import qualified Test.Scher.Klee.Impure as Strict
+import Test.Scher.Symbolic
 
-data Klee = Lazy | Eager
---import Test.Scher.Klee.Impure
+instance Symbolic Int where
+  make name = Sym $ \strat ->
+    case strat of
+      Eager -> Strict.int name
+      Lazy -> Lazy.int name
