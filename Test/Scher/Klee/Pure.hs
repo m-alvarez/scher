@@ -41,12 +41,12 @@ assert True = c_klee_assert 1
 assert False = c_klee_assert 0
 -}
 
-range :: Int -> Int -> String -> IO Int
-range !lo !hi name = do
-  c_name <- newCString name
-  return $ c_klee_range lo hi c_name
+range :: Int -> Int -> String -> Int
+range !lo !hi name = 
+  let c_name = unsafePerformIO $ newCString name
+  in c_name `seq` c_klee_range lo hi c_name
 
-int :: String -> IO Int
-int !name = do
-  c_name <- newCString name
-  return $ c_klee_int c_name
+int :: String -> Int
+int !name =
+  let c_name = unsafePerformIO $ newCString name
+  in c_name `seq` c_klee_int c_name

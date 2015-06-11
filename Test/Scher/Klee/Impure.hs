@@ -17,6 +17,4 @@ range !lo !hi name = withCString name $ \name ->
   c_klee_range lo hi name
 
 int :: String -> IO Int
-int name = do
-  c_name <- newCString name
-  c_klee_int c_name
+int name = withCString name c_klee_int
