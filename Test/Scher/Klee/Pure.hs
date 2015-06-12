@@ -3,6 +3,8 @@
 module Test.Scher.Klee.Pure
   ( range
   , int
+  , M
+  , run
   ) where
 
 import Foreign.C
@@ -50,3 +52,12 @@ int :: String -> Int
 int !name =
   let c_name = unsafePerformIO $ newCString name
   in c_name `seq` c_klee_int c_name
+
+newtype M a = M { runIdentity :: a }
+
+instance Functor M where
+  f `fmap` a = M $ f $ runIdentity a
+
+instance Monad M where
+  return  = M
+  a >>= f = f $ runIdentity a

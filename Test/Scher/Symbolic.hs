@@ -1,35 +1,37 @@
-module Test.Scher.Symbolic where
+module Test.Scher.Symbolic
+  ( Symbolic (make)
+  )
+  where
 
+import qualified Test.Scher.Generic as Generic
 import Data.Char
 import Data.Functor
 
-data Strategy = Eager | Lazy
+class Symbolic a where
+  make :: String -> Generic.M a
 
-newtype Sym t = Sym { runSym :: Strategy -> IO t }
+instance Symbolic Int where
+  make = Generic.int
 
-instance Functor Sym where
-  f `fmap` (Sym a) = Sym ((fmap f) . a)
+instance Symbolic Bool where
+  make name = do
+    i <- make (name ++ "%BoolVal") :: Generic.M Int
+    return $ i `rem` 2 == 0
 
-instance Monad Sym where
-  return a  = Sym $ \strat -> return a
-  (>>=) a f = Sym $ \strat -> do
-    a' <- runSym a strat
-    runSym (f a') strat
+instance Symbolic Char where
+  make name = do
+    i <- make (name ++ "%CharVal")
+    return (chr $ i `rem` 256)
 
-class Symbolic t where
-  make :: String -> Sym t
--- This syntax dodges a bug in the desugaring
 instance (Symbolic t) => Symbolic [t] where
-  make name =
-    make (name ++ "%IsCons")
-    >>= \end ->
-    if end
-    then return []
-    else make (name ++ "%car")
-         >>= \hd ->
-         make (name ++ "%cdr")
-         >>= \tl ->
-         return $ hd : tl
+  make name = do
+    isNil <- make $ name ++ "%IsNil"
+    if isNil
+      then return []
+      else do
+        car <- make $ name ++ "%car"
+        cdr <- make $ name ++ "%cdr"
+        return $ car : cdr
 
 instance (Symbolic t1, Symbolic t2) => Symbolic (t1, t2) where
   make name = do
@@ -53,17 +55,15 @@ instance (Symbolic t1, Symbolic t2, Symbolic t3, Symbolic t4) => Symbolic (t1, t
     return (x1, x2, x3, x4)
 
 instance (Symbolic t1, Symbolic t2) => Symbolic (Either t1 t2) where
-  make name =
-    make (name ++ "#isLeft") 
-    >>= \choice ->
-    if choice
-    then Left `fmap` make name
-    else Right `fmap` make name
+  make name = do
+    isLeft <- make (name ++ "#isLeft") 
+    if isLeft
+      then Left `fmap` make name
+      else Right `fmap` make name
 
 instance (Symbolic t) => Symbolic (Maybe t) where
-  make name =
-    make (name ++ "%IsJust")
-    >>= \isJust ->
-    if isJust
-    then Just `fmap` make name
-    else return Nothing
+  make name = do
+    isNothing <- make $ name ++ "%IsNothing"
+    if isNothing
+      then return Nothing
+      else Just `fmap` make name

@@ -1,8 +1,6 @@
 module Test.Scher
-  ( module Test.Scher.Klee
-  , module Test.Scher.Symbolic
+  ( module Test.Scher.Property
   )
   where
 
-import Test.Scher.Klee
-import Test.Scher.Symbolic
+import Test.Scher.Property
