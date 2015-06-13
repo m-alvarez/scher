@@ -11,16 +11,16 @@ class Symbolic a where
   make :: String -> Generic.M a
 
 instance Symbolic Int where
-  make = Generic.int
+  make name = Generic.int (name ++ "%IntVal")
 
 instance Symbolic Bool where
   make name = do
-    i <- make (name ++ "%BoolVal") :: Generic.M Int
-    return $ i `rem` 2 == 0
+    i <- Generic.int (name ++ "%BoolVal") :: Generic.M Int
+    return $ i == 1
 
 instance Symbolic Char where
   make name = do
-    i <- make (name ++ "%CharVal")
+    i <- Generic.int (name ++ "%CharVal")
     return (chr $ i `rem` 256)
 
 instance (Symbolic t) => Symbolic [t] where
