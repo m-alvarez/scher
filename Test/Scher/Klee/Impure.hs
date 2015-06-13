@@ -24,4 +24,4 @@ int name = withCString name c_klee_int
 type M = IO
 
 run :: M a -> IO a
-run = identity
+run = id

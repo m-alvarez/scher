@@ -43,15 +43,13 @@ assert True = c_klee_assert 1
 assert False = c_klee_assert 0
 -}
 
-range :: Int -> Int -> String -> Int
+range :: Int -> Int -> String -> M Int
 range !lo !hi name = 
-  let c_name = unsafePerformIO $ newCString name
-  in c_name `seq` c_klee_range lo hi c_name
+  M $ let c_name = unsafePerformIO $ newCString name in c_name `seq` c_klee_range lo hi c_name
 
-int :: String -> Int
+int :: String -> M Int
 int !name =
-  let c_name = unsafePerformIO $ newCString name
-  in c_name `seq` c_klee_int c_name
+  M $ let c_name = unsafePerformIO $ newCString name in c_name `seq` c_klee_int c_name
 
 newtype M a = M { runIdentity :: a }
 
@@ -61,3 +59,6 @@ instance Functor M where
 instance Monad M where
   return  = M
   a >>= f = f $ runIdentity a
+
+run :: M a -> IO a
+run = return . runIdentity

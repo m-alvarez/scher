@@ -20,13 +20,13 @@ forAll = App
 
 instance (Symbolic a, Property b) => Property (App a b) where
   verify (App name f) = do
-    arg <- make name
+    arg <- run $ make name
     verify $ f arg
 
 instance (Symbolic a, Property b) => Property (a -> b) where
   verify f = do
     name <- genSym
-    arg <- make name
+    arg <- run $ make name
     verify $ f arg
 
 data App a b = App String (a -> b)

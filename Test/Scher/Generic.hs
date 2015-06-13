@@ -33,4 +33,4 @@ int :: String -> M Int
 int = K.int
 
 range :: Int -> Int -> String -> M Int
-range = K.range
+range i j name = K.range i j name
