@@ -1,6 +1,6 @@
 # scher
 
-scher (pronounced 'escher') is an experimental library for doing [concolic](https://en.wikipedia.org/wiki/Concolic_testing), property-based testing of Haskell programs by leveraging
+scher (pronounced 'escher') is an experimental library for doing symbolic, property-based testing of Haskell programs by leveraging
 the Klee execution engine. This work is being developed in the context of my Master's Thesis under Matthew Hague, at
 the Royal Holloway University of London.
 It's under heavy development and should be considered experimental software for all intents and purposes. Any and
