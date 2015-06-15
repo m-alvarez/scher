@@ -11,7 +11,7 @@ comments.
 
 First of all, you will need:
 
-* The [Klee](http://klee.github.io) symbolic execution engine. This, in turn, requires the LLVM. I'm successfully using LLVM 2.9, but if you really want to it should be possible to get it working with 3.4.
+* The [Klee](https://klee.github.io) symbolic execution engine. This, in turn, requires the LLVM. I'm successfully using LLVM 2.9, but if you really want to it should be possible to get it working with 3.4.
 * llvm-gcc, which you can get from the [LLVM releases page](http://llvm.org/releases/download.html#2.9).
 * The [klee-uclibc](https://github.com/klee/klee-uclibc) standard library.
 * My modified [jhc](https://github.com/m-alvarez/jhc) compiler. Unfortunately, scher will not work with GHC.
