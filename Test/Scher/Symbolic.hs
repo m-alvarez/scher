@@ -22,7 +22,6 @@ instance (Symbolic t, Integral t) => Symbolic (Ratio t) where
   make name = do
     num <- make $ name ++ "%Numerator"
     den <- make $ name ++ "%Denominator"
-    Generic.assume (den /= 0)
     return $ num % den
 
 instance Symbolic Bool where
