@@ -6,12 +6,24 @@ module Test.Scher.Symbolic
 import qualified Test.Scher.Generic as Generic
 import Data.Char
 import Data.Functor
+import Data.Ratio
 
 class Symbolic a where
   make :: String -> Generic.M a
 
 instance Symbolic Int where
   make name = Generic.int (name ++ "%IntVal")
+
+-- Note that JHC's Integer isn't arbitrary precission
+instance Symbolic Integer where
+  make name = Generic.integer (name ++ "%IntVal")
+
+instance (Symbolic t, Integral t) => Symbolic (Ratio t) where
+  make name = do
+    num <- make $ name ++ "%Numerator"
+    den <- make $ name ++ "%Denominator"
+    Generic.assume (den /= 0)
+    return $ num % den
 
 instance Symbolic Bool where
   make name = do

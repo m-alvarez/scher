@@ -1,6 +1,7 @@
 module Test.Scher.Generic
   ( M
   , int
+  , integer
   , range
   , run
   , assert
