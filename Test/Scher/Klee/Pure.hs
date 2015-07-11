@@ -15,7 +15,7 @@ import System.IO.Unsafe
 
 foreign import capi "klee/klee.h klee_range" c_klee_range   :: Int -> Int -> CString -> Int
 foreign import capi "klee/klee.h klee_int"   c_klee_int     :: CString -> Int
-foreign import capi "extras.h klee_integer"  c_klee_integer :: CString -> Integer
+foreign import capi "extras.h klee_intmax_t" c_klee_integer :: CString -> Integer
 
 range :: Int -> Int -> String -> M Int
 range !lo !hi name = 
@@ -24,6 +24,10 @@ range !lo !hi name =
 int :: String -> M Int
 int !name =
   M $ let c_name = unsafePerformIO $ newCString name in c_name `seq` c_klee_int c_name
+
+integer :: String -> M Integer
+integer !name =
+  M $ let c_name = unsafePerformIO $ newCString name in c_name `seq` c_klee_integer c_name
 
 newtype M a = M { runIdentity :: a }
 
