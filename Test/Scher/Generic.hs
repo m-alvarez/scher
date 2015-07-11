@@ -33,5 +33,8 @@ run = K.run
 int :: String -> M Int
 int = K.int
 
+integer :: String -> M Integer
+integer = K.integer
+
 range :: Int -> Int -> String -> M Int
 range i j name = K.range i j name

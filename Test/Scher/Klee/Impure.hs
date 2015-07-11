@@ -3,6 +3,7 @@
 module Test.Scher.Klee.Impure
   ( range
   , int
+  , integer
   , M
   , run
   ) where

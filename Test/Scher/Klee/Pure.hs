@@ -3,6 +3,7 @@
 module Test.Scher.Klee.Pure
   ( range
   , int
+  , integer
   , M
   , run
   ) where

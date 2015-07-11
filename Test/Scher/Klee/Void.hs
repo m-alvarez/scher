@@ -1,5 +1,6 @@
 module Test.Scher.Klee.Void
   ( int
+  , integer
   , range
   , M
   , run
