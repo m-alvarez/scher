@@ -26,7 +26,7 @@ instance Equiv Char where
   equiv x y = x `ptr_eql` y || x == y
 
 instance (Equiv t) => Equiv [t] where
-  equiv l1 l2 = l1 `ptr_eql` y ||
+  equiv l1 l2 = l1 `ptr_eql` l2 ||
     case (l1, l2) of
       ([], [])     -> True
       ([], _:_)    -> False

@@ -18,11 +18,13 @@ instance Symbolic Int where
 instance Symbolic Integer where
   make name = Generic.integer (name ++ "%IntVal")
 
+{-
 instance (Symbolic t, Integral t) => Symbolic (Ratio t) where
   make name = do
     num <- make $ name ++ "%Numerator"
     den <- make $ name ++ "%Denominator"
     return $ num % den
+    -}
 
 instance Symbolic Bool where
   make name = do
