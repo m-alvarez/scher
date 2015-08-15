@@ -1,5 +1,6 @@
 module Test.Scher.Symbolic
   ( Symbolic (make)
+  , makeRange
   )
   where
 
@@ -7,6 +8,9 @@ import qualified Test.Scher.Generic as Generic
 import Data.Char
 import Data.Functor
 import Data.Ratio
+
+makeRange :: Int -> Int -> String -> Generic.M Int
+makeRange i j name = Generic.range i j (name ++ "%IntVal")
 
 class Symbolic a where
   make :: String -> Generic.M a

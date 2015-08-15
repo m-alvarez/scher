@@ -7,6 +7,7 @@ module Test.Scher.Property
 import Test.Scher.Generic
 import Test.Scher.Symbolic
 import System.IO.Unsafe
+import System.Random
 import Data.IORef
 
 class Property b where
@@ -15,11 +16,11 @@ class Property b where
 instance Property Bool where
   verify b = assert b
 
-forAll :: (Symbolic a, Property b) => String -> (a -> b) -> App a b
-forAll = App
+forAll :: (Symbolic a, Property b) => String -> (a -> b) -> All a b
+forAll = All
 
-instance (Symbolic a, Property b) => Property (App a b) where
-  verify (App name f) = do
+instance (Symbolic a, Property b) => Property (All a b) where
+  verify (All name f) = do
     arg <- run $ make name
     verify $ f arg
 
@@ -29,13 +30,12 @@ instance (Symbolic a, Property b) => Property (a -> b) where
     arg <- run $ make name
     verify $ f arg
 
-data App a b = App String (a -> b)
+data All a b = All String (a -> b)
 
 counter :: IORef Int
 counter = unsafePerformIO $ newIORef 0
 
 genSym :: IO String
 genSym = do
-  val <- readIORef counter
-  modifyIORef counter (1 +)
-  return $ "#AUTO" ++ show val
+  num <- getStdRandom (random) :: IO Int
+  return $ "#AUTO-" ++ show (abs num)
